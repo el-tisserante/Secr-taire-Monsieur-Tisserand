@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secrétaire de Monsieur Tisserand</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .chat-pattern {
+      background-color: #0b141a;
+      background-image: radial-gradient(#111b21 2px, transparent 2px);
+      background-size: 16px 16px;
+    }
+    .user-bubble { background-color: #005c4b; color: #e9edef; }
+    .ai-bubble { background-color: #202c33; color: #e9edef; }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="bg-[#202c33] px-4 py-3 flex items-center justify-between border-b border-gray-700 shadow">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center font-bold text-lg text-white">
+        ST
+      </div>
+      <div>
+        <h1 class="font-semibold text-base leading-tight">Alex</h1>
+        <p class="text-xs text-teal-400">Secrétaire de Monsieur Tisserand</p>
+      </div>
+    </div>
+    <button id="open-settings" class="text-gray-400 hover:text-white p-2 text-xl">
+      <i class="fas fa-cog"></i>
+    </button>
+  </header>
+
+  <!-- Chat Container -->
+  <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 chat-pattern">
+    <div class="flex justify-start">
+      <div class="ai-bubble p-3 rounded-lg max-w-[80%] text-sm shadow">
+        Bonjour ! Je suis Alex, le secrétaire de Monsieur Tisserand. Que puis-je faire pour vous aujourd'hui ?
+      </div>
+    </div>
+  </main>
+
+  <!-- Input Area & Actions -->
+  <footer class="bg-[#202c33] p-3 border-t border-gray-700">
+    <div id="finish-banner" class="hidden mb-3 p-2 bg-teal-900/40 border border-teal-500/30 rounded text-center text-xs text-teal-200">
+      <i class="fas fa-check-circle mr-1"></i> Résumé transmis à M. Tisserand sur Telegram.
+    </div>
+
+    <form id="chat-form" class="flex items-center space-x-2">
+      <input id="user-input" type="text" placeholder="Écrivez votre message..." 
+        class="flex-1 bg-[#2a3942] text-white px-4 py-2.5 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-teal-500">
+      <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white p-2.5 rounded-full w-10 h-10 flex items-center justify-center">
+        <i class="fas fa-paper-plane text-sm"></i>
+      </button>
+    </form>
+
+    <div class="mt-2 flex justify-center">
+      <button id="end-chat-btn" class="text-xs bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-full flex items-center space-x-1 shadow transition">
+        <i class="fas fa-flag-checkered"></i>
+        <span>Terminer la conversation</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Modal Paramètres -->
+  <div id="settings-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-[#202c33] border border-gray-700 rounded-xl p-6 w-full max-w-md space-y-4">
+      <h2 class="text-lg font-bold flex items-center space-x-2">
+        <i class="fas fa-cog text-teal-400"></i>
+        <span>Configuration de l'Assistant</span>
+      </h2>
+      <div>
+        <label class="block text-xs font-medium mb-1 text-gray-300">Clé API Gemini</label>
+        <input id="gemini-key" type="password" placeholder="AIzaSy..." class="w-full bg-[#2a3942] border border-gray-600 rounded p-2 text-sm text-white">
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1 text-gray-300">Token Bot Telegram</label>
+        <input id="telegram-token" type="text" placeholder="8881345817:..." class="w-full bg-[#2a3942] border border-gray-600 rounded p-2 text-sm text-white">
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1 text-gray-300">Telegram Chat ID</label>
+        <input id="telegram-chat-id" type="text" placeholder="696755650" class="w-full bg-[#2a3942] border border-gray-600 rounded p-2 text-sm text-white">
+      </div>
+      <div class="flex justify-end space-x-2 pt-2">
+        <button id="close-settings" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-sm">Fermer</button>
+        <button id="save-settings" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 rounded text-sm font-semibold">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const settingsBtn = document.getElementById('open-settings');
+    const settingsModal = document.getElementById('settings-modal');
+    const closeSettings = document.getElementById('close-settings');
+    const saveSettings = document.getElementById('save-settings');
+
+    settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    closeSettings.addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+    saveSettings.addEventListener('click', () => {
+      localStorage.setItem('gemini_key', document.getElementById('gemini-key').value);
+      localStorage.setItem('telegram_token', document.getElementById('telegram-token').value);
+      localStorage.setItem('telegram_chat_id', document.getElementById('telegram-chat-id').value);
+      settingsModal.classList.add('hidden');
+      alert('Paramètres enregistrés !');
+    });
+
+    // Chargement des valeurs enregistrées
+    document.getElementById('gemini-key').value = localStorage.getItem('gemini_key') || '';
+    document.getElementById('telegram-token').value = localStorage.getItem('telegram_token') || '';
+    document.getElementById('telegram-chat-id').value = localStorage.getItem('telegram_chat_id') || '696755650';
+  </script>
+</body>
+</html>
