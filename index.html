@@ -18,7 +18,7 @@
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans h-screen flex flex-col justify-between">
 
-  <!-- Header -->
+  <!-- Header (Bouton paramètres retiré) -->
   <header class="bg-[#202c33] px-4 py-3 flex items-center justify-between border-b border-gray-700 shadow">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center font-bold text-lg text-white">
@@ -29,9 +29,6 @@
         <p class="text-xs text-teal-400">Secrétaire de Monsieur Tisserand</p>
       </div>
     </div>
-    <button id="open-settings" class="text-gray-400 hover:text-white p-2 text-xl">
-      <i class="fas fa-cog"></i>
-    </button>
   </header>
 
   <!-- Chat Container -->
@@ -46,83 +43,37 @@
   <!-- Input Area & Actions -->
   <footer class="bg-[#202c33] p-3 border-t border-gray-700">
     <div id="finish-banner" class="hidden mb-3 p-2 bg-teal-900/40 border border-teal-500/30 rounded text-center text-xs text-teal-200">
-      <i class="fas fa-check-circle mr-1"></i> Résumé transmis à M. Tisserand sur Telegram.
+      <i class="fas fa-check-circle mr-1"></i> Résumé transmis à M. Tisserand.
     </div>
 
     <form id="chat-form" class="flex items-center space-x-2">
       <input id="user-input" type="text" placeholder="Écrivez votre message..." 
-        class="flex-1 bg-[#2a3942] text-white px-4 py-2.5 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-teal-500">
+        class="flex-1 bg-[#2a3942] text-white px-4 py-2.5 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-teal-500" required>
       <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white p-2.5 rounded-full w-10 h-10 flex items-center justify-center">
         <i class="fas fa-paper-plane text-sm"></i>
       </button>
     </form>
 
     <div class="mt-2 flex justify-center">
-      <button id="end-chat-btn" class="text-xs bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-full flex items-center space-x-1 shadow transition">
+      <button id="end-chat-btn" type="button" class="text-xs bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-full flex items-center space-x-1 shadow transition">
         <i class="fas fa-flag-checkered"></i>
         <span>Terminer la conversation</span>
       </button>
     </div>
   </footer>
 
-  <!-- Modal Paramètres -->
-  <div id="settings-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-[#202c33] border border-gray-700 rounded-xl p-6 w-full max-w-md space-y-4">
-      <h2 class="text-lg font-bold flex items-center space-x-2">
-        <i class="fas fa-cog text-teal-400"></i>
-        <span>Configuration de l'Assistant</span>
-      </h2>
-      <div>
-        <label class="block text-xs font-medium mb-1 text-gray-300">Clé API Gemini</label>
-        <input id="gemini-key" type="password" class="w-full bg-[#2a3942] border border-gray-600 rounded p-2 text-sm text-white">
-      </div>
-      <div>
-        <label class="block text-xs font-medium mb-1 text-gray-300">Token Bot Telegram</label>
-        <input id="telegram-token" type="text" class="w-full bg-[#2a3942] border border-gray-600 rounded p-2 text-sm text-white">
-      </div>
-      <div>
-        <label class="block text-xs font-medium mb-1 text-gray-300">Telegram Chat ID</label>
-        <input id="telegram-chat-id" type="text" class="w-full bg-[#2a3942] border border-gray-600 rounded p-2 text-sm text-white">
-      </div>
-      <div class="flex justify-end space-x-2 pt-2">
-        <button id="close-settings" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-sm">Fermer</button>
-        <button id="save-settings" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 rounded text-sm font-semibold">Enregistrer</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // Identifiants intégrés par défaut
-    const DEFAULT_GEMINI_KEY = 'AQ.Ab8RN6K5mU5NnjoWsAsmrb3riYL1VhJ0x0bCY1kbAZ-N6jMqHw';
-    const DEFAULT_TELEGRAM_TOKEN = '8881345817:AAHrrmjAw3tzf-yYKXH4R_LpXcSKCjB49g8';
-    const DEFAULT_CHAT_ID = '696755650';
+    // Configuration invisible
+    const GEMINI_KEY = 'AQ.Ab8RN6K5mU5NnjoWsAsmrb3riYL1VhJ0x0bCY1kbAZ-N6jMqHw';
+    const TELEGRAM_TOKEN = '8881345817:AAHrrmjAw3tzf-yYKXH4R_LpXcSKCjB49g8';
+    const CHAT_ID = '696755650';
 
     let history = [];
-
-    const settingsBtn = document.getElementById('open-settings');
-    const settingsModal = document.getElementById('settings-modal');
-    const closeSettings = document.getElementById('close-settings');
-    const saveSettings = document.getElementById('save-settings');
     const chatContainer = document.getElementById('chat-container');
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
     const endChatBtn = document.getElementById('end-chat-btn');
     const finishBanner = document.getElementById('finish-banner');
-
-    document.getElementById('gemini-key').value = localStorage.getItem('gemini_key') || DEFAULT_GEMINI_KEY;
-    document.getElementById('telegram-token').value = localStorage.getItem('telegram_token') || DEFAULT_TELEGRAM_TOKEN;
-    document.getElementById('telegram-chat-id').value = localStorage.getItem('telegram_chat_id') || DEFAULT_CHAT_ID;
-
-    settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
-    closeSettings.addEventListener('click', () => settingsModal.classList.add('hidden'));
-
-    saveSettings.addEventListener('click', () => {
-      localStorage.setItem('gemini_key', document.getElementById('gemini-key').value);
-      localStorage.setItem('telegram_token', document.getElementById('telegram-token').value);
-      localStorage.setItem('telegram_chat_id', document.getElementById('telegram-chat-id').value);
-      settingsModal.classList.add('hidden');
-      alert('Paramètres enregistrés !');
-    });
 
     function appendMessage(role, text) {
       const wrapper = document.createElement('div');
@@ -144,14 +95,12 @@
       history.push({ role: 'user', parts: [{ text }] });
       userInput.value = '';
 
-      const key = localStorage.getItem('gemini_key') || DEFAULT_GEMINI_KEY;
-
       const systemInstruction = `Tu es Alex, le secrétaire virtuel personnel de Monsieur Tisserand. 
 Ton rôle est d'accueillir chaleureusement les personnes qui cherchent à le joindre, de qualifier la nature de leur demande (rendez-vous, question administrative, projet, urgence) et de recueillir leurs coordonnées si nécessaire. 
 Reste toujours très poli, professionnel, courtois et synthétique. Ne prends aucun engagement ferme au nom de M. Tisserand.`;
 
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -161,15 +110,20 @@ Reste toujours très poli, professionnel, courtois et synthétique. Ne prends au
         });
 
         const data = await response.json();
+        
+        if (data.error) {
+          console.error(data.error);
+          appendMessage('model', "Désolé, une erreur est survenue lors de la communication avec l'IA.");
+          return;
+        }
+
         if (data.candidates && data.candidates[0].content.parts[0].text) {
           const reply = data.candidates[0].content.parts[0].text;
           appendMessage('model', reply);
           history.push({ role: 'model', parts: [{ text: reply }] });
-        } else {
-          appendMessage('model', "Désolé, une erreur est survenue lors de la réponse.");
         }
       } catch (err) {
-        appendMessage('model', "Erreur de connexion avec l'IA.");
+        appendMessage('model', "Erreur de connexion au serveur.");
       }
     });
 
@@ -180,11 +134,7 @@ Reste toujours très poli, professionnel, courtois et synthétique. Ne prends au
       }
 
       endChatBtn.disabled = true;
-      endChatBtn.innerText = "Envoi du résumé...";
-
-      const key = localStorage.getItem('gemini_key') || DEFAULT_GEMINI_KEY;
-      const botToken = localStorage.getItem('telegram_token') || DEFAULT_TELEGRAM_TOKEN;
-      const chatId = localStorage.getItem('telegram_chat_id') || DEFAULT_CHAT_ID;
+      endChatBtn.innerText = "Envoi en cours...";
 
       try {
         const summaryPrompt = [
@@ -192,20 +142,28 @@ Reste toujours très poli, professionnel, courtois et synthétique. Ne prends au
           { role: 'user', parts: [{ text: "Rédige une fiche de résumé claire et synthétique de cette discussion destinée à M. Tisserand sous ce format :\n- Nom/Identité de l'interlocuteur :\n- Objet de la demande :\n- Degré d'urgence :\n- Action requise / Coordonnées :" }] }
         ];
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: summaryPrompt })
         });
 
         const data = await res.json();
+        
+        if (data.error) {
+          alert("Erreur lors de la génération du résumé.");
+          endChatBtn.disabled = false;
+          endChatBtn.innerText = "Terminer la conversation";
+          return;
+        }
+
         const summaryText = data.candidates[0].content.parts[0].text;
 
-        const telegramRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        const telegramRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: chatId,
+            chat_id: CHAT_ID,
             text: `📋 *Nouveau message de la secrétaire Alex*\n\n${summaryText}`,
             parse_mode: 'Markdown'
           })
@@ -215,12 +173,12 @@ Reste toujours très poli, professionnel, courtois et synthétique. Ne prends au
           finishBanner.classList.remove('hidden');
           endChatBtn.innerText = "Conversation terminée";
         } else {
-          alert("Erreur lors de l'envoi du résumé sur Telegram.");
+          alert("Le résumé a été créé, mais l'envoi sur Telegram a échoué.");
           endChatBtn.disabled = false;
           endChatBtn.innerText = "Terminer la conversation";
         }
       } catch (err) {
-        alert("Erreur lors de la génération ou de l'envoi du résumé.");
+        alert("Erreur générale lors de la procédure de fin de chat.");
         endChatBtn.disabled = false;
         endChatBtn.innerText = "Terminer la conversation";
       }
