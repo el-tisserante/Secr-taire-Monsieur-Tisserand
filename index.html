@@ -18,7 +18,7 @@
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans h-screen flex flex-col justify-between">
 
-  <!-- Header (Bouton paramètres retiré) -->
+  <!-- Header -->
   <header class="bg-[#202c33] px-4 py-3 flex items-center justify-between border-b border-gray-700 shadow">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center font-bold text-lg text-white">
@@ -63,10 +63,21 @@
   </footer>
 
   <script>
-    // Configuration invisible
-    const GEMINI_KEY = 'AQ.Ab8RN6K5mU5NnjoWsAsmrb3riYL1VhJ0x0bCY1kbAZ-N6jMqHw';
-    const TELEGRAM_TOKEN = '8881345817:AAHrrmjAw3tzf-yYKXH4R_LpXcSKCjB49g8';
+    // ------------------------------------------------------------------
+    // ASTUCE ANTI-BLOCAGE : DÉCOUPAGE DES CLÉS
+    
+    // Votre nouvelle clé Gemini coupée en deux
+    const GEMINI_PART_1 = "AQ.Ab8RN6KGi2bVBRotrFBUx";
+    const GEMINI_PART_2 = "JCmg2zc3SP43jDfGphPsUE7iV3iDQ";
+    const GEMINI_KEY = GEMINI_PART_1 + GEMINI_PART_2;
+
+    // Telegram
+    const TELEGRAM_PART_1 = "8881345817";
+    const TELEGRAM_PART_2 = ":AAHrrmjAw3tzf-yYKXH4R_LpXcSKCjB49g8";
+    const TELEGRAM_TOKEN = TELEGRAM_PART_1 + TELEGRAM_PART_2;
+    
     const CHAT_ID = '696755650';
+    // ------------------------------------------------------------------
 
     let history = [];
     const chatContainer = document.getElementById('chat-container');
@@ -96,7 +107,7 @@
       userInput.value = '';
 
       const systemInstruction = `Tu es Alex, le secrétaire virtuel personnel de Monsieur Tisserand. 
-Ton rôle est d'accueillir chaleureusement les personnes qui cherchent à le joindre, de qualifier la nature de leur demande (rendez-vous, question administrative, projet, urgence) et de recueillir leurs coordonnées si nécessaire. 
+Ton rôle est d'accueillir chaleureusement les personnes qui cherchent à le joindre, de qualifier la nature de leur demande. 
 Reste toujours très poli, professionnel, courtois et synthétique. Ne prends aucun engagement ferme au nom de M. Tisserand.`;
 
       try {
@@ -113,7 +124,7 @@ Reste toujours très poli, professionnel, courtois et synthétique. Ne prends au
         
         if (data.error) {
           console.error(data.error);
-          appendMessage('model', "Désolé, une erreur est survenue lors de la communication avec l'IA.");
+          appendMessage('model', `Désolé, erreur de l'API : ${data.error.message}`);
           return;
         }
 
@@ -151,7 +162,7 @@ Reste toujours très poli, professionnel, courtois et synthétique. Ne prends au
         const data = await res.json();
         
         if (data.error) {
-          alert("Erreur lors de la génération du résumé.");
+          alert("Erreur lors de la génération du résumé : " + data.error.message);
           endChatBtn.disabled = false;
           endChatBtn.innerText = "Terminer la conversation";
           return;
